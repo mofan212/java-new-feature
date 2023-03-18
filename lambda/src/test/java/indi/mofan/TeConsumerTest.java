@@ -1,7 +1,7 @@
 package indi.mofan;
 
 import indi.mofan.lambda.TeConsumer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;

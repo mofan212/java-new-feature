@@ -2,8 +2,8 @@ package indi.mofan;
 
 import indi.mofan.domain.Trader;
 import indi.mofan.domain.Transaction;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
  * @date 2021/7/16 15:36
  */
 public class StreamPractice {
-    @Before
+    @BeforeEach
     private void init() {
         Trader raoul = new Trader("Raoul", "Cambridge");
         Trader mario = new Trader("Mario", "Milan");
@@ -30,7 +30,7 @@ public class StreamPractice {
         );
     }
 
-    @After
+    @AfterEach
     private void destroy() {}
 
 }

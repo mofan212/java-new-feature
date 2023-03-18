@@ -8,8 +8,8 @@ import indi.mofan.pojo.Parent;
 import indi.mofan.spi.Runnable;
 import indi.mofan.util.ReflectionUtil;
 import jdk.internal.org.objectweb.asm.Type;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.util.ReflectionUtils;
 
 import java.beans.BeanInfo;
@@ -86,7 +86,7 @@ public class LambdaTest {
         indi.mofan.lambda.SerializedLambda serializedLambda = getSerializedLambda(function);
 
 
-        Assert.assertEquals("getName", serializedLambda.getImplMethodName());
+        Assertions.assertEquals("getName", serializedLambda.getImplMethodName());
     }
 
     private static indi.mofan.lambda.SerializedLambda getSerializedLambda(Serializable serializable) throws Exception {
@@ -116,16 +116,16 @@ public class LambdaTest {
 
         // 反射获取“捕获类”对应的 Class 对象
         String capturingClassName = serializedLambda.getCapturingClass().replace("/", ".");
-        Assert.assertEquals(this.getClass().getName(), capturingClassName);
+        Assertions.assertEquals(this.getClass().getName(), capturingClassName);
         Class<?> capturingClass = Class.forName(capturingClassName);
 
         // 调用 Spring 的方法
         ReflectionUtils.doWithMethods(capturingClass, method -> {
-            Assert.assertEquals("$deserializeLambda$", method.getName());
-            Assert.assertEquals("private static", Modifier.toString(method.getModifiers()));
-            Assert.assertEquals(1, method.getParameterCount());
-            Assert.assertEquals(SerializedLambda.class.getName(), method.getParameterTypes()[0].getName());
-            Assert.assertEquals(Object.class.getName(), method.getReturnType().getName());
+            Assertions.assertEquals("$deserializeLambda$", method.getName());
+            Assertions.assertEquals("private static", Modifier.toString(method.getModifiers()));
+            Assertions.assertEquals(1, method.getParameterCount());
+            Assertions.assertEquals(SerializedLambda.class.getName(), method.getParameterTypes()[0].getName());
+            Assertions.assertEquals(Object.class.getName(), method.getReturnType().getName());
         }, method -> Objects.equals(method.getName(), "$deserializeLambda$"));
     }
 
@@ -134,7 +134,7 @@ public class LambdaTest {
 
         Person person = new Person();
         SSupplier<String> consumer = person::getName;
-        Assert.assertEquals("indi.mofan.domain.Person", getImplClass(consumer));
+        Assertions.assertEquals("indi.mofan.domain.Person", getImplClass(consumer));
 
         SSupplier<String> supplier = new SSupplier<String>() {
             @Override
@@ -142,7 +142,7 @@ public class LambdaTest {
                 return person.getName();
             }
         };
-        Assert.assertTrue(getImplClass(supplier).isEmpty());
+        Assertions.assertTrue(getImplClass(supplier).isEmpty());
     }
 
     @Test
@@ -157,12 +157,12 @@ public class LambdaTest {
         List<String> beanFieldInfo = Arrays.stream(propertyDescriptors).map(PropertyDescriptor::getName)
                 .collect(Collectors.toList());
         List<String> classFieldInfo = Arrays.stream(Person.class.getDeclaredFields()).map(Field::getName).collect(Collectors.toList());
-        Assert.assertTrue(classFieldInfo.containsAll(beanFieldInfo));
-        Assert.assertEquals(2, beanFieldInfo.size());
+        Assertions.assertTrue(classFieldInfo.containsAll(beanFieldInfo));
+        Assertions.assertEquals(2, beanFieldInfo.size());
 
         // 获取 bean 中 public 的方法
         MethodDescriptor[] methodInfo = beanInfo.getMethodDescriptors();
-        Assert.assertEquals(4, methodInfo.length);
+        Assertions.assertEquals(4, methodInfo.length);
 
 
         // 获取属性的值
@@ -170,12 +170,12 @@ public class LambdaTest {
         person.setName("mofan");
         String propertyName = "name";
         PropertyDescriptor nameProperty = new PropertyDescriptor(propertyName, Person.class);
-        Assert.assertEquals("mofan", nameProperty.getReadMethod().invoke(person));
+        Assertions.assertEquals("mofan", nameProperty.getReadMethod().invoke(person));
         // 修改属性的值
         nameProperty.getWriteMethod().invoke(person, "TestName");
-        Assert.assertEquals("TestName", nameProperty.getReadMethod().invoke(person));
+        Assertions.assertEquals("TestName", nameProperty.getReadMethod().invoke(person));
         // 原对象也有影响
-        Assert.assertEquals("TestName", person.getName());
+        Assertions.assertEquals("TestName", person.getName());
     }
 
     @Test
@@ -184,7 +184,7 @@ public class LambdaTest {
 
         // 获取所有属性
         PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
-        Assert.assertEquals(3, propertyDescriptors.length);
+        Assertions.assertEquals(3, propertyDescriptors.length);
     }
 
     @Test
@@ -201,7 +201,7 @@ public class LambdaTest {
     public void testReflectionUtil() {
         SFunction<Person, String> function = Person::getName;
         String fieldName = ReflectionUtil.getFieldName(function);
-        Assert.assertEquals("name", fieldName);
+        Assertions.assertEquals("name", fieldName);
     }
 
     @Test
@@ -221,9 +221,9 @@ public class LambdaTest {
         SFunction<Person, String> fun1 = Person::getName;
         SFunction<Person, String> fun2 = Person::getName;
 
-        Assert.assertNotSame(fun1, fun2);
-        Assert.assertNotEquals(fun1, fun2);
-        Assert.assertNotSame(fun1.getClass(), fun2.getClass());
+        Assertions.assertNotSame(fun1, fun2);
+        Assertions.assertNotEquals(fun1, fun2);
+        Assertions.assertNotSame(fun1.getClass(), fun2.getClass());
     }
 
     @Test
@@ -231,7 +231,7 @@ public class LambdaTest {
         SFunction<Person, String> function1 = Person::getName;
         SFunction<Person, String> function2 = Person::getName;
 
-        Assert.assertNotSame(function1, function2);
+        Assertions.assertNotSame(function1, function2);
 
         List<SFunction<Person, String>> list = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
@@ -239,22 +239,22 @@ public class LambdaTest {
             System.out.println(function);
             list.add(function);
         }
-        Assert.assertSame(list.get(0), list.get(1));
-        Assert.assertSame(list.get(1), list.get(2));
-        Assert.assertSame(list.get(2), list.get(0));
+        Assertions.assertSame(list.get(0), list.get(1));
+        Assertions.assertSame(list.get(1), list.get(2));
+        Assertions.assertSame(list.get(2), list.get(0));
     }
     
     @Test
     public void testGetModifierInfo() throws Exception {
-        Assert.assertEquals("java/lang/String", Type.getInternalName(String.class));
-        Assert.assertEquals("java/util/Map", Type.getInternalName(Map.class));
+        Assertions.assertEquals("java/lang/String", Type.getInternalName(String.class));
+        Assertions.assertEquals("java/util/Map", Type.getInternalName(Map.class));
 
-        Assert.assertEquals("Ljava/lang/String;", Type.getDescriptor(String.class));
+        Assertions.assertEquals("Ljava/lang/String;", Type.getDescriptor(String.class));
 
-        Assert.assertEquals("I", Type.INT_TYPE.getDescriptor());
+        Assertions.assertEquals("I", Type.INT_TYPE.getDescriptor());
 
         Method setNameMethod = Person.class.getDeclaredMethod("setName", String.class);
-        Assert.assertEquals("(Ljava/lang/String;)V", Type.getMethodDescriptor(setNameMethod));
+        Assertions.assertEquals("(Ljava/lang/String;)V", Type.getMethodDescriptor(setNameMethod));
     }
 
     @Test
@@ -263,42 +263,42 @@ public class LambdaTest {
         Class<Child> childClass = Child.class;
 
         // 当前类及其父类中所有 public 的字段
-        Assert.assertEquals(1, parentClass.getFields().length);
-        Assert.assertTrue(Arrays.stream(parentClass.getFields()).allMatch(i -> "publicParentField".equals(i.getName())));
+        Assertions.assertEquals(1, parentClass.getFields().length);
+        Assertions.assertTrue(Arrays.stream(parentClass.getFields()).allMatch(i -> "publicParentField".equals(i.getName())));
         // 当前类中所有的字段
         List<String> parentFieldNameList = Arrays.asList("privateParentField", "publicParentField");
-        Assert.assertEquals(parentFieldNameList.size(), parentClass.getDeclaredFields().length);
-        Assert.assertTrue(Arrays.stream(parentClass.getDeclaredFields()).map(Field::getName).allMatch(parentFieldNameList::contains));
+        Assertions.assertEquals(parentFieldNameList.size(), parentClass.getDeclaredFields().length);
+        Assertions.assertTrue(Arrays.stream(parentClass.getDeclaredFields()).map(Field::getName).allMatch(parentFieldNameList::contains));
 
         // 当前类及其父类中所有 public 的字段
         List<String> childPublicFieldNameList = Arrays.asList("publicChildField", "publicParentField", "CONSTANT");
-        Assert.assertEquals(childPublicFieldNameList.size(), childClass.getFields().length);
-        Assert.assertTrue(Arrays.stream(childClass.getFields()).map(Field::getName).allMatch(childPublicFieldNameList::contains));
+        Assertions.assertEquals(childPublicFieldNameList.size(), childClass.getFields().length);
+        Assertions.assertTrue(Arrays.stream(childClass.getFields()).map(Field::getName).allMatch(childPublicFieldNameList::contains));
         // 当前类中所有的字段（实现的接口中的常量不在其中）
         List<String> childFiledNameList = Arrays.asList("privateChildField", "publicChildField");
-        Assert.assertEquals(childFiledNameList.size(), childClass.getDeclaredFields().length);
-        Assert.assertTrue(Arrays.stream(childClass.getDeclaredFields()).map(Field::getName).allMatch(childFiledNameList::contains));
+        Assertions.assertEquals(childFiledNameList.size(), childClass.getDeclaredFields().length);
+        Assertions.assertTrue(Arrays.stream(childClass.getDeclaredFields()).map(Field::getName).allMatch(childFiledNameList::contains));
 
         // 当前类及其父类中所有 public 的方法（因此包含 Object 类中 public 的方法）
         List<String> parentPublicMethodNameList = Arrays.asList("setPrivateParentField", "getPublicParentField",
                 "getPrivateParentField", "setPublicParentField");
-        Assert.assertTrue(parentClass.getMethods().length > 4);
-        Assert.assertEquals(Object.class.getMethods().length + 4, parentClass.getMethods().length);
-        Assert.assertTrue(Arrays.stream(parentClass.getMethods()).map(Method::getName).collect(Collectors.toList()).containsAll(parentPublicMethodNameList));
+        Assertions.assertTrue(parentClass.getMethods().length > 4);
+        Assertions.assertEquals(Object.class.getMethods().length + 4, parentClass.getMethods().length);
+        Assertions.assertTrue(Arrays.stream(parentClass.getMethods()).map(Method::getName).collect(Collectors.toList()).containsAll(parentPublicMethodNameList));
         // 当前类中所有的方法
-        Assert.assertEquals(parentPublicMethodNameList.size(), parentClass.getDeclaredMethods().length);
-        Assert.assertTrue(Arrays.stream(parentClass.getDeclaredMethods()).map(Method::getName).allMatch(parentPublicMethodNameList::contains));
+        Assertions.assertEquals(parentPublicMethodNameList.size(), parentClass.getDeclaredMethods().length);
+        Assertions.assertTrue(Arrays.stream(parentClass.getDeclaredMethods()).map(Method::getName).allMatch(parentPublicMethodNameList::contains));
 
         // 当前类及其父类中所有 public 的方法
         List<String> childPublicMethodNameList = Arrays.asList("add", "setPublicChildField", "getPublicChildField",
                 "setPrivateChildField", "getPrivateChildField");
-        Assert.assertTrue(childClass.getMethods().length > childPublicMethodNameList.size());
-        Assert.assertEquals(parentClass.getMethods().length + childPublicMethodNameList.size(), childClass.getMethods().length);
-        Assert.assertTrue(Arrays.stream(childClass.getMethods()).map(Method::getName).collect(Collectors.toList()).containsAll(childPublicMethodNameList));
+        Assertions.assertTrue(childClass.getMethods().length > childPublicMethodNameList.size());
+        Assertions.assertEquals(parentClass.getMethods().length + childPublicMethodNameList.size(), childClass.getMethods().length);
+        Assertions.assertTrue(Arrays.stream(childClass.getMethods()).map(Method::getName).collect(Collectors.toList()).containsAll(childPublicMethodNameList));
 
         // 当前类中所有的方法
-        Assert.assertEquals(childPublicMethodNameList.size(), childClass.getDeclaredMethods().length);
-        Assert.assertTrue(Arrays.stream(childClass.getDeclaredMethods()).map(Method::getName).allMatch(childPublicMethodNameList::contains));
+        Assertions.assertEquals(childPublicMethodNameList.size(), childClass.getDeclaredMethods().length);
+        Assertions.assertTrue(Arrays.stream(childClass.getDeclaredMethods()).map(Method::getName).allMatch(childPublicMethodNameList::contains));
     }
 
 

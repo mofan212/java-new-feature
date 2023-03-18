@@ -12,9 +12,9 @@ import indi.mofan.serial.Student;
 import indi.mofan.serial.TransientComplex;
 import indi.mofan.serial.User;
 import indi.mofan.serial.Vip;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,7 +38,7 @@ public class SerialTest {
         ObjectOutputStream oos = new ObjectOutputStream(fos);
         oos.writeObject(people);
         // 判断序列化生成的文件是否存在
-        Assert.assertTrue(new File("mofan.out").exists());
+        Assertions.assertTrue(new File("mofan.out").exists());
     }
 
     @Test
@@ -49,8 +49,8 @@ public class SerialTest {
          * 构造 People 对象时，并没有调用它的无参构造方法也没有调用 clone 方法
          */
         People people = (People) ois.readObject();
-        Assert.assertEquals("Mofan", people.getName());
-        Assert.assertEquals(20, people.getAge());
+        Assertions.assertEquals("Mofan", people.getName());
+        Assertions.assertEquals(20, people.getAge());
     }
 
     @Test
@@ -78,11 +78,11 @@ public class SerialTest {
         Company deSerialHugeCompany = (Company) ois.readObject();
         Company deSerialSmallCompany = (Company) ois.readObject();
 
-        Assert.assertSame(deSerialList, deSerialHugeCompany.getEmployees());
-        Assert.assertSame(deSerialList, deSerialSmallCompany.getEmployees());
-        Assert.assertNotSame(deSerialHugeCompany, deSerialSmallCompany);
+        Assertions.assertSame(deSerialList, deSerialHugeCompany.getEmployees());
+        Assertions.assertSame(deSerialList, deSerialSmallCompany.getEmployees());
+        Assertions.assertNotSame(deSerialHugeCompany, deSerialSmallCompany);
 
-        Assert.assertNotSame(list, deSerialList);
+        Assertions.assertNotSame(list, deSerialList);
     }
 
     @Test
@@ -94,9 +94,9 @@ public class SerialTest {
         ObjectOutputStream oos = new ObjectOutputStream(fos);
         try {
             oos.writeObject(simple);
-            Assert.fail();
+            Assertions.fail();
         } catch (IOException e) {
-            Assert.assertTrue(e instanceof NotSerializableException);
+            Assertions.assertTrue(e instanceof NotSerializableException);
         }
     }
 
@@ -110,10 +110,10 @@ public class SerialTest {
         ObjectOutputStream oos = new ObjectOutputStream(fos);
         try {
             oos.writeObject(complex);
-            Assert.fail();
+            Assertions.fail();
         } catch (IOException e) {
             // 抛出 NotSerializableException
-            Assert.assertTrue(e instanceof NotSerializableException);
+            Assertions.assertTrue(e instanceof NotSerializableException);
         }
     }
 
@@ -132,10 +132,10 @@ public class SerialTest {
         ObjectInputStream ois = new ObjectInputStream(fis);
         TransientComplex object = (TransientComplex) ois.readObject();
 
-        Assert.assertEquals("string", object.getString());
-        Assert.assertTrue(object.isBool());
+        Assertions.assertEquals("string", object.getString());
+        Assertions.assertTrue(object.isBool());
         // 虽然 Simple 没有实现序列化接口，但它被 transient 修饰，不会被序列化，因此也不会报错
-        Assert.assertNull(object.getSimple());
+        Assertions.assertNull(object.getSimple());
     }
 
     @Test
@@ -152,9 +152,9 @@ public class SerialTest {
         ObjectInputStream ois = new ObjectInputStream(fis);
         try {
             ois.readObject();
-            Assert.fail();
+            Assertions.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof IllegalArgumentException);
+            Assertions.assertTrue(e instanceof IllegalArgumentException);
         }
     }
 
@@ -170,12 +170,12 @@ public class SerialTest {
         ObjectInputStream ois = new ObjectInputStream(fis);
         User mofan = (User) ois.readObject();
 
-        Assert.assertEquals("mofan", mofan.getUserName());
-        Assert.assertEquals("12345678", mofan.getPassword());
+        Assertions.assertEquals("mofan", mofan.getUserName());
+        Assertions.assertEquals("12345678", mofan.getPassword());
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void test() throws Exception {
         // Vip 还未继承 User
         Vip vip = new Vip();
@@ -187,14 +187,14 @@ public class SerialTest {
     }
     
     @Test
-    @Ignore
+    @Disabled
     public void testReadObjectNoData() throws Exception {
         FileInputStream fis = new FileInputStream("vip.out");
         ObjectInputStream ois = new ObjectInputStream(fis);
         Vip newVip = (Vip) ois.readObject();
 
-        Assert.assertEquals("Unknown", newVip.getUserName());
-        Assert.assertEquals("***", newVip.getPassword());
+        Assertions.assertEquals("Unknown", newVip.getUserName());
+        Assertions.assertEquals("***", newVip.getPassword());
     }
 
     @Test
@@ -211,10 +211,10 @@ public class SerialTest {
         ObjectInputStream ois = new ObjectInputStream(fis);
         Object object = ois.readObject();
 
-        Assert.assertTrue(object instanceof People);
+        Assertions.assertTrue(object instanceof People);
         People people = (People) object;
-        Assert.assertEquals("mofan", people.getName());
-        Assert.assertEquals(20, people.getAge());
+        Assertions.assertEquals("mofan", people.getName());
+        Assertions.assertEquals(20, people.getAge());
     }
 
     @Test
@@ -231,9 +231,9 @@ public class SerialTest {
         ObjectInputStream ois = new ObjectInputStream(fis);
         Object object = ois.readObject();
 
-        Assert.assertTrue(object instanceof Simple);
+        Assertions.assertTrue(object instanceof Simple);
         Simple simple = (Simple) object;
-        Assert.assertEquals("Simple", simple.getStringField());
+        Assertions.assertEquals("Simple", simple.getStringField());
     }
     
     @Test
@@ -248,8 +248,8 @@ public class SerialTest {
         ObjectInputStream ois = new ObjectInputStream(fis);
         Singleton singleton = (Singleton) ois.readObject();
 
-//        Assert.assertNotSame(Singleton.getSingleton(), singleton);
-        Assert.assertSame(Singleton.getSingleton(), singleton);
+//        Assertions.assertNotSame(Singleton.getSingleton(), singleton);
+        Assertions.assertSame(Singleton.getSingleton(), singleton);
     }
 
     @Test
@@ -267,7 +267,7 @@ public class SerialTest {
         Object object = ois.readObject();
 
         Animal cat = (Animal) object;
-        Assert.assertEquals("cat", cat.getType());
-        Assert.assertEquals(1, cat.getAge());
+        Assertions.assertEquals("cat", cat.getType());
+        Assertions.assertEquals(1, cat.getAge());
     }
 }
