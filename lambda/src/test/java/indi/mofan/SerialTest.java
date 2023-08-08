@@ -14,7 +14,10 @@ import indi.mofan.serial.User;
 import indi.mofan.serial.Vip;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,8 +33,10 @@ import java.util.List;
  * @author mofan
  * @date 2022/6/22 19:51
  */
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SerialTest {
     @Test
+    @Order(1)
     public void testSerial() throws Exception {
         People people = new People("Mofan", 20);
         FileOutputStream fos = new FileOutputStream("mofan.out");
@@ -42,6 +47,7 @@ public class SerialTest {
     }
 
     @Test
+    @Order(2)
     public void testDeSerial() throws Exception {
         FileInputStream fis = new FileInputStream("mofan.out");
         ObjectInputStream ois = new ObjectInputStream(fis);
