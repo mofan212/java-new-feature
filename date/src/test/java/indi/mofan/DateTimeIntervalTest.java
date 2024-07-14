@@ -10,7 +10,7 @@ import java.time.Period;
  * @author mofan
  * @date 2023/3/18 19:51
  */
-public class DateTimeInterval {
+public class DateTimeIntervalTest {
     @Test
     public void testDateInterval() {
         LocalDate firstDay = LocalDate.of(2023, 1, 1);

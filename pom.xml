@@ -11,7 +11,7 @@
     </modules>
 
     <groupId>indi.mofan</groupId>
-    <artifactId>java8</artifactId>
+    <artifactId>java-new-feature</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
 
