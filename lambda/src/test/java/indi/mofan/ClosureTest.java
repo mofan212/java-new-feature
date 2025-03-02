@@ -23,17 +23,28 @@ public class ClosureTest implements WithAssertions {
     @Test
     public void testClosure() {
         int a = 1;
+        // a = 2;
         // Lambda 表达式绑定了局部变量 a
         Op op = b -> a + b;
         assertThat(op.op(1)).isEqualTo(2);
 
+        NUMBER_INT = 3;
         // Lambda 表达式绑定了成员变量
         op = b -> NUMBER_INT + b;
         assertThat(op.op(1)).isEqualTo(3);
 
+        STATIC_INT = 4;
         // Lambda 表达式绑定了静态变量
         op = b -> STATIC_INT + b;
         assertThat(op.op(1)).isEqualTo(4);
+    }
+
+    @Test
+    public void testHoldStatus() {
+        int[] arr = {1};
+        arr[0] = 2;
+        Op op = b -> arr[0] + b;
+        assertThat(op.op(1)).isEqualTo(3);
     }
 
     @AllArgsConstructor

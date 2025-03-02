@@ -8,6 +8,7 @@
         <module>lambda</module>
         <module>stream</module>
         <module>date</module>
+        <module>lambda-in-action</module>
     </modules>
 
     <groupId>indi.mofan</groupId>

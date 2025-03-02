@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -51,7 +52,7 @@ public class CurryingTest implements WithAssertions {
         List<Integer> c = Lists.newArrayList(7, 8, 9);
         return fc.op(c);
     }
-    
+
     @Test
     public void testCurrying() {
         List<Integer> list = step3(step2(step1()));
@@ -82,16 +83,22 @@ public class CurryingTest implements WithAssertions {
         // 1.0;2.0;3
         consumer.accept(1.0, 2f, 3);
 
+        Function<Double, BiConsumer<Float, Integer>> fun = t -> (u, r) -> {
+            System.out.println(t + ";" + u + ";" + r);
+        };
+        // 1.0;2.0;3
+        fun.apply(1.0).accept(2f, 3);
+
         Function<Double, Function<Float, Consumer<Integer>>> f = t -> u -> r -> {
             System.out.println(t + ";" + u + ";" + r);
         };
         // 1.0;2.0;3
         f.apply(1.0).apply(2f).accept(3);
 
-        Function<Double, BiConsumer<Float, Integer>> fun = t -> (u, r) -> {
+        BiFunction<Double, Float, Consumer<Integer>> biFun = (t, u) -> r -> {
             System.out.println(t + ";" + u + ";" + r);
         };
         // 1.0;2.0;3
-        fun.apply(1.0).accept(2f, 3);
+        biFun.apply(1.0, 2f).accept(3);
     }
 }
