@@ -154,9 +154,8 @@ public class LambdaTest {
 
         // 获取属性信息
         PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
-        List<String> beanFieldInfo = Arrays.stream(propertyDescriptors).map(PropertyDescriptor::getName)
-                .collect(Collectors.toList());
-        List<String> classFieldInfo = Arrays.stream(Person.class.getDeclaredFields()).map(Field::getName).collect(Collectors.toList());
+        List<String> beanFieldInfo = Arrays.stream(propertyDescriptors).map(PropertyDescriptor::getName).toList();
+        List<String> classFieldInfo = Arrays.stream(Person.class.getDeclaredFields()).map(Field::getName).toList();
         Assertions.assertTrue(classFieldInfo.containsAll(beanFieldInfo));
         Assertions.assertEquals(2, beanFieldInfo.size());
 
