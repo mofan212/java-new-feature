@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntUnaryOperator;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
@@ -61,6 +62,44 @@ public class SimpleTest implements WithAssertions {
     public void testHigherOrderFunction() {
         int x = add(-5, 6, Math::abs);
         assertThat(x).isEqualTo(11);
+    }
+
+    // -------------------- 复合 Lambda 表达式 --------------------
+
+    enum Color {
+        RED, GREEN,
+    }
+
+    record Apple(Color color, int weight) {
+    }
+
+    @Test
+    public void testPredicate() {
+        Predicate<Apple> redApple = apple -> Color.RED.equals(apple.color);
+
+        // 不是红色的苹果
+        Predicate<Apple> notRedApple = redApple.negate();
+
+        // 红苹果且重量大于 150g
+        Predicate<Apple> redAndHeavyApple = redApple.and(apple -> apple.weight > 150);
+
+        // 要么是 150g 以上的红苹果要么是绿苹果
+        Predicate<Apple> redAndHeavyAppleOrGreen = redApple.or(apple -> apple.weight > 150)
+                .or(apple -> Color.GREEN.equals(apple.color));
+    }
+
+    @Test
+    public void testFunction() {
+        Function<Integer, Integer> f = x -> x + 1;
+        Function<Integer, Integer> g = x -> x * 2;
+
+        // g(f(x))
+        Function<Integer, Integer> x = f.andThen(g);
+        assertThat(x.apply(1)).isEqualTo(4);
+
+        // f(g(x))
+        Function<Integer, Integer> y = f.compose(g);
+        assertThat(y.apply(1)).isEqualTo(3);
     }
 
     // -------------------- 包装受检异常 --------------------
