@@ -1,9 +1,13 @@
 package indi.mofan.apply;
 
 
+import indi.mofan.apply.prime.BruteForce;
+import indi.mofan.apply.prime.MathUtils;
+import indi.mofan.apply.prime.delay.LazyList;
 import org.assertj.core.api.WithAssertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -77,5 +81,34 @@ public class ApplyTest implements WithAssertions {
 
         value = RecursionWithHigherOrderFunction.FACTORIAL.apply(RecursionWithHigherOrderFunction.FACTORIAL, 5);
         assertThat(value).isEqualTo(120);
+    }
+
+    @Test
+    public void testLazyList() {
+        LazyList<Integer> list = LazyList.from(2);
+        Integer two = list.head();
+        assertThat(two).isEqualTo(2);
+        Integer three = list.tail().head();
+        assertThat(three).isEqualTo(3);
+        Integer four = list.tail().tail().head();
+        assertThat(four).isEqualTo(4);
+    }
+
+    @Test
+    public void testPrime() {
+        List<Integer> primes = MathUtils.primes(3).toList();
+        assertThat(primes).containsExactly(2, 3, 5);
+
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> BruteForce.primesErr(BruteForce.numbers().limit(19)))
+                .withMessageContaining("stream has already been operated upon or closed");
+
+        LazyList<Integer> numbers = LazyList.from(2);
+        Integer two = numbers.head();
+        assertThat(two).isEqualTo(2);
+        Integer three = numbers.tail().head();
+        assertThat(three).isEqualTo(3);
+        Integer four = numbers.tail().tail().head();
+        assertThat(four).isEqualTo(4);
     }
 }
