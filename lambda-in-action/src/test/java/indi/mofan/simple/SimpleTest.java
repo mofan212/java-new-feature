@@ -132,13 +132,13 @@ public class SimpleTest implements WithAssertions {
 
     @FunctionalInterface
     public interface ThrowingFunction<T, R, E extends Exception> {
-        R accept(T t) throws E;
+        R apply(T t) throws E;
     }
 
     public static <T, R> Function<T, R> wrap(ThrowingFunction<T, R, Exception> function) {
         return t -> {
             try {
-                return function.accept(t);
+                return function.apply(t);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

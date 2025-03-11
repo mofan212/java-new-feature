@@ -21,7 +21,7 @@ public class ApplyTest implements WithAssertions {
 
     @SuppressWarnings("unchecked")
     static class RecursionWithClosure {
-        static Function<Integer, Integer>[] recursiveFunction = new Function[10];
+        static Function<Integer, Integer>[] recursiveFunction = new Function[1];
 
         static {
             recursiveFunction[0] = x -> {
@@ -32,6 +32,25 @@ public class ApplyTest implements WithAssertions {
 
         static int factorial(int n) {
             return recursiveFunction[0].apply(n);
+        }
+    }
+
+    static class Fn {
+        Function<Integer, Integer> function;
+    }
+
+    static class RecursionFunc {
+        static Fn fn = new Fn();
+
+        static {
+            fn.function = x -> {
+                if (x == 0) return 1;
+                return x * fn.function.apply(x - 1);
+            };
+        }
+
+        static int factorial(int n) {
+            return fn.function.apply(n);
         }
     }
 
@@ -48,6 +67,9 @@ public class ApplyTest implements WithAssertions {
     @Test
     public void testRecursion() {
         int value = Factorial.factorial(5);
+        assertThat(value).isEqualTo(120);
+
+        value = RecursionFunc.factorial(5);
         assertThat(value).isEqualTo(120);
 
         value = RecursionWithClosure.factorial(5);
