@@ -1,7 +1,7 @@
 package indi.mofan.apply;
 
 
-import indi.mofan.apply.prime.BruteForce;
+import indi.mofan.apply.prime.Eratosthenes;
 import indi.mofan.apply.prime.MathUtils;
 import indi.mofan.apply.prime.delay.LazyList;
 import org.assertj.core.api.WithAssertions;
@@ -100,7 +100,7 @@ public class ApplyTest implements WithAssertions {
         assertThat(primes).containsExactly(2, 3, 5);
 
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> BruteForce.primesErr(BruteForce.numbers().limit(19)))
+                .isThrownBy(() -> Eratosthenes.primesErr(Eratosthenes.numbers().limit(19)))
                 .withMessageContaining("stream has already been operated upon or closed");
 
         LazyList<Integer> numbers = LazyList.from(2);

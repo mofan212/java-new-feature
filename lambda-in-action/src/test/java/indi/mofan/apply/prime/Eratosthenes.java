@@ -7,7 +7,7 @@ import java.util.stream.IntStream;
  * @author mofan
  * @date 2025/3/11 16:48
  */
-public class BruteForce {
+public class Eratosthenes {
     /**
      * 返回从 2 开始的整数流
      */
@@ -16,14 +16,14 @@ public class BruteForce {
     }
 
     /**
-     * 获取整数流的第一个整数
+     * 获取整数流的第一个质数
      */
     static int head(IntStream numbers) {
         return numbers.findFirst().getAsInt();
     }
 
     /**
-     * 跳过当前整数流的第一个元素
+     * 跳过当前整数流的第一个元素，也就是跳过第一个质数
      */
     static IntStream tail(IntStream numbers) {
         return numbers.skip(1);
