@@ -104,11 +104,11 @@ public class ApplyTest implements WithAssertions {
                 .withMessageContaining("stream has already been operated upon or closed");
 
         LazyList<Integer> numbers = LazyList.from(2);
-        Integer two = numbers.head();
+        Integer two = LazyList.primes(numbers).head();
         assertThat(two).isEqualTo(2);
-        Integer three = numbers.tail().head();
+        Integer three = LazyList.primes(numbers).tail().head();
         assertThat(three).isEqualTo(3);
-        Integer four = numbers.tail().tail().head();
-        assertThat(four).isEqualTo(4);
+        Integer five = LazyList.primes(numbers).tail().tail().head();
+        assertThat(five).isEqualTo(5);
     }
 }

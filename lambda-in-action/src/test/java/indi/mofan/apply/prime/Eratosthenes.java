@@ -19,7 +19,7 @@ public class Eratosthenes {
      * 获取整数流的第一个质数
      */
     static int head(IntStream numbers) {
-        return numbers.findFirst().getAsInt();
+        return numbers.findFirst().orElseThrow();
     }
 
     /**
