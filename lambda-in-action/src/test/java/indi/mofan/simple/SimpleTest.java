@@ -12,8 +12,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.function.IntUnaryOperator;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -242,7 +246,109 @@ public class SimpleTest implements WithAssertions {
 
         // process(str -> System.out.println("Lambda In Action"));
 
+        // 使用 x -> { foo(); } 与 void 兼容
+        process(str -> {
+            System.out.println("Lambda In Action");
+        });
+
+        // 使用 x -> ( foo() ) 与值兼容
+        process(str -> (str.toLowerCase()));
+
         process((Consumer<String>) str -> System.out.println("Lambda In Action"));
     }
 
+    private static <T> void consumerIntFunction(Consumer<T> consumer, IntFunction<T> generator) {
+    }
+
+    private static <T> void consumerIntFunction(Function<T, ?> consumer, IntFunction<T> generator) {
+    }
+
+    /**
+     * <a href="https://stackoverflow.com/questions/29323520/reference-to-method-is-ambiguous-when-using-lambdas-and-generics/">Reference to method is ambiguous when using lambdas and generics</a>
+     */
+    @Test
+    public void testMethodReferenceTypeInference() {
+
+        consumerIntFunction(data -> {
+            // 与 void 兼容的块，可以通过表达式识别，无需解析实际类型
+            Arrays.sort(data);
+        }, int[]::new);
+
+        /*
+         * 如果是方法引用或者简化的 Lambda 表达式（没有大括号的）就需要进行类型推导：
+         * 1. 是否是一个 void 函数，即 Consumer
+         * 2. 是否是一个值返回函数，即 Function
+         */
+        // consumerIntFunction(Arrays::sort, int[]::new);
+
+        /*
+         * 问题的关键：解析方法需要知道所需的方法签名，这应该通过目标类型确定，但是目标类型
+         * 只有在泛型方法的类型参数已知是才能确定。
+         * 从理论上来说，「方法重载解析」和「类型推断」可以同时进行，但实际上是先进行「方法重载解析」，
+         * 再进行「类型推断」，因此「类型推断」得到的类型信息不能用于解决「方法重载解析」，最终导致
+         * 编译报错。
+         */
+
+        /*
+         * 一个表达式与目标类型之间的潜在兼容关系（see https://docs.oracle.com/javase/specs/jls/se8/html/jls-15.html#jls-15.12.2.1）：
+         * 1. 如果满足以下所有条件，那么一个 Lambda 表达式会和函数式接口类型兼容：
+         *    - 目标类型的函数类型的 arity 与 Lambda 表达式的 arity 相同
+         *    - 如果目标类型的函数类型返回 void，那么 Lambda 体要么是一个语句表达式，要么是一个与 void 兼容的代码块
+         *    - 如果目标类型的函数类型有返回类型（非 void），那么 Lambda 体要么是一个表达式，要么是一个值兼容代码块
+         * 2. 如果满足以下条件之一，则方法引用表达式可能与函数式接口类型兼容：当该类型的函数类型参数数量为 n时，存在
+         * 至少一个参数数量为 n 的可能适用于该方法引用表达式的方法，并且以下条件之一成立：
+         *   - 方法引用表达式的形式为 `引用类型::[参数类型]`，并且至少存在一个可能适用的方法满足以下条件之一：
+         *     1) 方法是静态方法，并且参数数量是 n
+         *     2) 方法是非静态方法，并且参数数量是 n - 1
+         *   - 方法引用表达式的形式为其他形式时，至少存在一个可能适用的方法为非静态方法。
+         */
+    }
+
+    private static void run(Consumer<Integer> consumer) {
+        System.out.println("consumer");
+    }
+
+    private static void run(Function<Integer, Integer> function) {
+        System.out.println("function");
+    }
+
+    /**
+     * <a href="https://stackoverflow.com/questions/23430854/lambda-expression-and-method-overloading-doubts">Lambda expression and method overloading doubts</a>
+     */
+    @Test
+    public void testLambdaExpAndMethodOverloadingDoubts() {
+        run(i -> {});
+
+        run(i -> 1);
+    }
+
+    private static void method1(Predicate<Integer> predicate){
+        System.out.println("Inside Predicate");
+    }
+
+    private static void method1(Function<Integer,String> function){
+        System.out.println("Inside Function");
+    }
+
+    public static void method2(Consumer<Integer> consumer){
+        System.out.println("Inside Consumer");
+    }
+
+    public static void method2(Predicate<Integer> predicate){
+        System.out.println("Inside Predicate");
+    }
+
+    /**
+     * <a href="https://stackoverflow.com/questions/39294545/java-8-lambda-ambiguous-method-for-functional-interface-target-type">Java 8 lambda ambiguous method for functional interface - Target Type</a>
+     */
+    @Test
+    public void testAmbiguousTargetType() {
+        // method1((i) -> "Test");
+
+        List<Integer> lst = new ArrayList<>();
+
+        method2(i -> true);
+
+        // method2(s -> lst.add(s));
+    }
 }
