@@ -223,10 +223,6 @@ public class SimpleTest implements WithAssertions {
 
     // -------------------- 类型推断 --------------------
 
-    public void run(Runnable runnable) {
-        runnable.run();
-    }
-
     public void process(Consumer<String> consumer) {
         consumer.accept("Lambda In Action");
     }
@@ -237,13 +233,6 @@ public class SimpleTest implements WithAssertions {
 
     @Test
     public void testTypeInference() {
-        run(() -> {
-            System.out.println("Lambda In Action");
-        });
-
-        // 方法调用的返回值为 void 时，可以不使用括号环绕返回值为空的单行方法调用
-        run(() -> System.out.println("Lambda In Action"));
-
         // process(str -> System.out.println("Lambda In Action"));
 
         // 使用 x -> { foo(); } 与 void 兼容
@@ -257,10 +246,10 @@ public class SimpleTest implements WithAssertions {
         process((Consumer<String>) str -> System.out.println("Lambda In Action"));
     }
 
-    private static <T> void consumerIntFunction(Consumer<T> consumer, IntFunction<T> generator) {
+    private static <T> void consumerIntFunction(Consumer<int[]> consumer, IntFunction<T> generator) {
     }
 
-    private static <T> void consumerIntFunction(Function<T, ?> consumer, IntFunction<T> generator) {
+    private static <T> void consumerIntFunction(Function<int[], ?> consumer, IntFunction<T> generator) {
     }
 
     /**
@@ -279,7 +268,9 @@ public class SimpleTest implements WithAssertions {
          * 1. 是否是一个 void 函数，即 Consumer
          * 2. 是否是一个值返回函数，即 Function
          */
-        // consumerIntFunction(Arrays::sort, int[]::new);
+        /* consumerIntFunction(Arrays::sort, int[]::new);
+         * consumerIntFunction(data -> Arrays.sort(data), int[]::new);
+         */
 
         /*
          * 问题的关键：解析方法需要知道所需的方法签名，这应该通过目标类型确定，但是目标类型
@@ -290,12 +281,12 @@ public class SimpleTest implements WithAssertions {
          */
 
         /*
-         * 一个表达式与目标类型之间的潜在兼容关系（see https://docs.oracle.com/javase/specs/jls/se8/html/jls-15.html#jls-15.12.2.1）：
+         * 根据以下规则，表达式可能与目标类型兼容：（see https://docs.oracle.com/javase/specs/jls/se8/html/jls-15.html#jls-15.12.2.1）：
          * 1. 如果满足以下所有条件，那么一个 Lambda 表达式会和函数式接口类型兼容：
-         *    - 目标类型的函数类型的 arity 与 Lambda 表达式的 arity 相同
-         *    - 如果目标类型的函数类型返回 void，那么 Lambda 体要么是一个语句表达式，要么是一个与 void 兼容的代码块
-         *    - 如果目标类型的函数类型有返回类型（非 void），那么 Lambda 体要么是一个表达式，要么是一个值兼容代码块
-         * 2. 如果满足以下条件之一，则方法引用表达式可能与函数式接口类型兼容：当该类型的函数类型参数数量为 n时，存在
+         *    - 目标类型函数类型的参数数量与 Lambda 表达式的参数数量相同
+         *    - 如果目标类型函数类型返回 void，那么 Lambda 主体要么是一个表达式语句，要么是一个与 void 兼容块
+         *    - 如果目标类型的函数类型有返回类型（非 void），那么 Lambda 主体要么是一个表达式，要么是一个值兼容块
+         * 2. 如果满足以下条件之一，则方法引用表达式可能与函数式接口类型兼容：当该类型的函数类型参数数量为 n 时，存在
          * 至少一个参数数量为 n 的可能适用于该方法引用表达式的方法，并且以下条件之一成立：
          *   - 方法引用表达式的形式为 `引用类型::[参数类型]`，并且至少存在一个可能适用的方法满足以下条件之一：
          *     1) 方法是静态方法，并且参数数量是 n
@@ -317,24 +308,25 @@ public class SimpleTest implements WithAssertions {
      */
     @Test
     public void testLambdaExpAndMethodOverloadingDoubts() {
-        run(i -> {});
+        run(i -> {
+        });
 
         run(i -> 1);
     }
 
-    private static void method1(Predicate<Integer> predicate){
+    private static void method1(Predicate<Integer> predicate) {
         System.out.println("Inside Predicate");
     }
 
-    private static void method1(Function<Integer,String> function){
+    private static void method1(Function<Integer, String> function) {
         System.out.println("Inside Function");
     }
 
-    public static void method2(Consumer<Integer> consumer){
+    public static void method2(Consumer<Integer> consumer) {
         System.out.println("Inside Consumer");
     }
 
-    public static void method2(Predicate<Integer> predicate){
+    public static void method2(Predicate<Integer> predicate) {
         System.out.println("Inside Predicate");
     }
 
