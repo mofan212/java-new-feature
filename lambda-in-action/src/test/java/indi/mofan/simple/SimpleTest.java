@@ -12,12 +12,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.IntFunction;
 import java.util.function.IntUnaryOperator;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -223,17 +220,19 @@ public class SimpleTest implements WithAssertions {
 
     // -------------------- 类型推断 --------------------
 
-    public void process(Consumer<String> consumer) {
-        consumer.accept("Lambda In Action");
+    private void process(Consumer<String> consumer) {
     }
 
-    public void process(Function<String, String> function) {
-        function.apply("Lambda In Action");
+    private void process(Function<String, String> function) {
     }
 
     @Test
     public void testTypeInference() {
         // process(str -> System.out.println("Lambda In Action"));
+
+        process((Consumer<String>) str -> System.out.println("Lambda In Action"));
+
+        process((String str) -> System.out.println("Lambda In Action"));
 
         // 使用 x -> { foo(); } 与 void 兼容
         process(str -> {
@@ -243,13 +242,16 @@ public class SimpleTest implements WithAssertions {
         // 使用 x -> ( foo() ) 与值兼容
         process(str -> (str.toLowerCase()));
 
-        process((Consumer<String>) str -> System.out.println("Lambda In Action"));
+        process(str -> "Lambda In Action");
+
+        process(str -> {
+        });
     }
 
-    private static <T> void consumerIntFunction(Consumer<int[]> consumer, IntFunction<T> generator) {
+    private void consumerIntFunction(Consumer<int[]> consumer) {
     }
 
-    private static <T> void consumerIntFunction(Function<int[], ?> consumer, IntFunction<T> generator) {
+    private void consumerIntFunction(Function<int[], ?> consumer) {
     }
 
     /**
@@ -261,16 +263,19 @@ public class SimpleTest implements WithAssertions {
         consumerIntFunction(data -> {
             // 与 void 兼容的块，可以通过表达式识别，无需解析实际类型
             Arrays.sort(data);
-        }, int[]::new);
+        });
 
         /*
          * 如果是方法引用或者简化的 Lambda 表达式（没有大括号的）就需要进行类型推导：
          * 1. 是否是一个 void 函数，即 Consumer
          * 2. 是否是一个值返回函数，即 Function
          */
-        /* consumerIntFunction(Arrays::sort, int[]::new);
-         * consumerIntFunction(data -> Arrays.sort(data), int[]::new);
+        /*
+         * consumerIntFunction(Arrays::sort);
+         * consumerIntFunction(data -> Arrays.sort(data));
          */
+
+        consumerIntFunction((Consumer<int[]>) Arrays::sort);
 
         /*
          * 问题的关键：解析方法需要知道所需的方法签名，这应该通过目标类型确定，但是目标类型
@@ -279,68 +284,5 @@ public class SimpleTest implements WithAssertions {
          * 再进行「类型推断」，因此「类型推断」得到的类型信息不能用于解决「方法重载解析」，最终导致
          * 编译报错。
          */
-
-        /*
-         * 根据以下规则，表达式可能与目标类型兼容：（see https://docs.oracle.com/javase/specs/jls/se8/html/jls-15.html#jls-15.12.2.1）：
-         * 1. 如果满足以下所有条件，那么一个 Lambda 表达式会和函数式接口类型兼容：
-         *    - 目标类型函数类型的参数数量与 Lambda 表达式的参数数量相同
-         *    - 如果目标类型函数类型返回 void，那么 Lambda 主体要么是一个表达式语句，要么是一个与 void 兼容块
-         *    - 如果目标类型的函数类型有返回类型（非 void），那么 Lambda 主体要么是一个表达式，要么是一个值兼容块
-         * 2. 如果满足以下条件之一，则方法引用表达式可能与函数式接口类型兼容：当该类型的函数类型参数数量为 n 时，存在
-         * 至少一个参数数量为 n 的可能适用于该方法引用表达式的方法，并且以下条件之一成立：
-         *   - 方法引用表达式的形式为 `引用类型::[参数类型]`，并且至少存在一个可能适用的方法满足以下条件之一：
-         *     1) 方法是静态方法，并且参数数量是 n
-         *     2) 方法是非静态方法，并且参数数量是 n - 1
-         *   - 方法引用表达式的形式为其他形式时，至少存在一个可能适用的方法为非静态方法。
-         */
-    }
-
-    private static void run(Consumer<Integer> consumer) {
-        System.out.println("consumer");
-    }
-
-    private static void run(Function<Integer, Integer> function) {
-        System.out.println("function");
-    }
-
-    /**
-     * <a href="https://stackoverflow.com/questions/23430854/lambda-expression-and-method-overloading-doubts">Lambda expression and method overloading doubts</a>
-     */
-    @Test
-    public void testLambdaExpAndMethodOverloadingDoubts() {
-        run(i -> {
-        });
-
-        run(i -> 1);
-    }
-
-    private static void method1(Predicate<Integer> predicate) {
-        System.out.println("Inside Predicate");
-    }
-
-    private static void method1(Function<Integer, String> function) {
-        System.out.println("Inside Function");
-    }
-
-    public static void method2(Consumer<Integer> consumer) {
-        System.out.println("Inside Consumer");
-    }
-
-    public static void method2(Predicate<Integer> predicate) {
-        System.out.println("Inside Predicate");
-    }
-
-    /**
-     * <a href="https://stackoverflow.com/questions/39294545/java-8-lambda-ambiguous-method-for-functional-interface-target-type">Java 8 lambda ambiguous method for functional interface - Target Type</a>
-     */
-    @Test
-    public void testAmbiguousTargetType() {
-        // method1((i) -> "Test");
-
-        List<Integer> lst = new ArrayList<>();
-
-        method2(i -> true);
-
-        // method2(s -> lst.add(s));
     }
 }
