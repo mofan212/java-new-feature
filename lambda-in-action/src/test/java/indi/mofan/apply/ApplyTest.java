@@ -66,6 +66,10 @@ public class ApplyTest implements WithAssertions {
 
         static final SelfApplicable<Integer, Integer> FACTORIAL = (self, n) ->
                 n == 0 ? 1 : n * self.apply(self, n - 1);
+
+        static int factorial(int n) {
+            return FACTORIAL.apply(FACTORIAL, n);
+        }
     }
 
     @Test
@@ -79,7 +83,7 @@ public class ApplyTest implements WithAssertions {
         value = RecursionWithClosure.factorial(5);
         assertThat(value).isEqualTo(120);
 
-        value = RecursionWithHigherOrderFunction.FACTORIAL.apply(RecursionWithHigherOrderFunction.FACTORIAL, 5);
+        value = RecursionWithHigherOrderFunction.factorial(5);
         assertThat(value).isEqualTo(120);
     }
 
