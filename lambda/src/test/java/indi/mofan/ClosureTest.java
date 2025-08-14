@@ -31,12 +31,12 @@ public class ClosureTest implements WithAssertions {
         NUMBER_INT = 3;
         // Lambda 表达式绑定了成员变量
         op = b -> NUMBER_INT + b;
-        assertThat(op.op(1)).isEqualTo(3);
+        assertThat(op.op(1)).isEqualTo(4);
 
         STATIC_INT = 4;
         // Lambda 表达式绑定了静态变量
         op = b -> STATIC_INT + b;
-        assertThat(op.op(1)).isEqualTo(4);
+        assertThat(op.op(1)).isEqualTo(5);
     }
 
     @Test
